@@ -23,9 +23,38 @@ var paddingTests8 = []struct {
 func TestPaddingExamples(t *testing.T) {
 
 	for _, tt := range paddingTests8 {
-		res := PadPKCS7(tt.in, 8)
+		res, err := PadPKCS7(tt.in, 8)
+		if err != nil {
+			t.Errorf("PadPKCS7(%q, 8) => Unexpected error: %v", tt.in, err)
+		}
+
 		if !bytes.Equal(res, tt.out) {
-			t.Errorf("padPKCS7(%q, 8) => %q, want %q", tt.in, res, tt.out)
+			t.Errorf("PadPKCS7(%q, 8) => %q, want %q", tt.in, res, tt.out)
 		}
 	}
+}
+
+func TestPaddingInvalidBlocksizes(t *testing.T) {
+
+	tin := paddingTests8[0].in
+
+	values := []int{0, -1, 256}
+
+	for _, v := range values {
+		_, err := PadPKCS7(tin, v)
+		if err == nil {
+			t.Errorf("PadPKCS7(..., %d) => Expected error, got none.", v)
+		}
+	}
+}
+
+func TestUnpaddingExamples(t *testing.T) {
+
+	for _, tt := range paddingTests8 {
+		res, _ := UnpadPKCS7(tt.out)
+		if !bytes.Equal(res, tt.in) {
+			t.Errorf("UnpadPKCS7(%q, 8) => %q, want %q", tt.out, res, tt.in)
+		}
+	}
+
 }
