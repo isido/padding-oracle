@@ -2,12 +2,19 @@ package padding
 
 import "fmt"
 
+func CheckBlocksize(blocksize int) error {
+	if blocksize < 1 || blocksize > 255 {
+		err := fmt.Errorf("Blocksize must be between 1 and 255 (was %d.", blocksize)
+		return err
+	}
+	return nil
+}
+
 // add PKCS7 type padding
 func PadPKCS7(b []byte, blocksize int) ([]byte, error) {
 
-	if blocksize < 1 || blocksize > 255 {
-		err := fmt.Errorf("PadPKCS7: Blocksize must be between 0 and 256 (was %d).",
-			blocksize)
+	err := CheckBlocksize(blocksize)
+	if err != nil {
 		return nil, err
 	}
 
@@ -24,12 +31,13 @@ func PadPKCS7(b []byte, blocksize int) ([]byte, error) {
 	return append(b, padding...), nil
 }
 
+// remove PKCS7 type padding, return error if the padding is not well-formed
 func UnpadPKCS7(b []byte) ([]byte, error) {
 
 	last_byte := b[len(b)-1]
 
 	// various checks for padding (also introduce nice timing oracles...)
-	if last_byte < 0 || last_byte > 255 {
+	if last_byte < 1 || last_byte > 255 {
 		err := fmt.Errorf("UnpadPKCS7: Invalid value for the last byte of padding: %d", last_byte)
 		return nil, err
 	}

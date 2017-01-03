@@ -1,8 +1,12 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"os"
+
+	"github.com/isido/padding-oracle/demo"
+	"github.com/isido/padding-oracle/oracle"
 )
 
 func main() {
@@ -21,22 +25,20 @@ func main() {
 	fmt.Println(plaintext)
 	fmt.Println("-----------------------------------------")
 
-	// crypt it with CBC + AES256
+	// prepare ciphertext for the oracle and crypt it
+	d := demo.MakeDemo()
 
-	// pad the text, if necessary
+	ciphertext, err := demo.Encrypt([]byte(plaintext), d.Iv, d.Key, d.Blocksize())
 
-	// encrypt it
+	if err != nil {
+		panic("Cannot encrypt text") // TODO fixme
+	}
 
-	// start decryption
+	// use padding oracle to decrypt the ciphertext
 
-	// generate false padding
-
-	// test it
-
-	// repeat
-
-	// until go the first byte
-
-	// repeat until the message is decrypted
+	fmt.Println("This is the padding oracle output:")
+	fmt.Println("----------------------------------")
+	res := hex.EncodeToString(oracle.PaddingOracle(d, ciphertext, d.Blocksize()))
+	fmt.Println(res)
 
 }
