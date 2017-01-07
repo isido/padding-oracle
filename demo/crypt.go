@@ -10,24 +10,30 @@ import (
 )
 
 type DemoOracle struct {
-	Iv        []byte
+	iv        []byte
 	Key       []byte
 	blocksize int
 }
 
+// return true, if after decrypting, the padding
+// is well-formed
 func (d DemoOracle) CorrectPadding(b []byte) bool {
 
-	_, err := Decrypt(b, d.Iv, d.Key, d.Blocksize())
+	_, err := Decrypt(b, d.IV(), d.Key, d.Blocksize())
 
 	if err != nil {
-		return true
-	} else {
 		return false
+	} else {
+		return true
 	}
 }
 
 func (d DemoOracle) Blocksize() int {
 	return d.blocksize
+}
+
+func (d DemoOracle) IV() []byte {
+	return d.iv
 }
 
 // TODO create demo with random iv and key

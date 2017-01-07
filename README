@@ -1,1 +1,22 @@
-A Work in progress.
+Padding Oracle
+==============
+
+A Demostration of Vaudenay's CBC padding oracle attack [1]. This follows the original paper quite closely, and to understand the code, reading the paper might be useful. More documentation forthcoming.
+
+Installation
+============
+
+Clone this repository and run
+
+    $ go build
+
+Use
+
+    $ ./padding-oracle ["optional example string"]
+
+More illustrative GUI visualising the decryption process might be forthcoming.
+
+References
+==========
+
+[1] Vaudenay S. (2002) Security Flaws Induced by CBC Padding — Applications to SSL, IPSEC, WTLS.... In: Knudsen L.R. (eds) Advances in Cryptology — EUROCRYPT 2002. EUROCRYPT 2002. Lecture Notes in Computer Science, vol 2332. Springer, Berlin, Heidelberg

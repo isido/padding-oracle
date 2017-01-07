@@ -49,3 +49,54 @@ func TestEnDeCryption(t *testing.T) {
 	}
 
 }
+
+func TestCorrectPadding(t *testing.T) {
+
+	// test with 100 random instances of en/decrypting
+
+	for i := 0; i < 100; i++ {
+
+		d := MakeDemo()
+
+		pt_size := rand.Int31n(1000) + 24
+		pt := make([]byte, pt_size)
+		_, err := rand.Read(pt)
+		if err != nil {
+			panic("Cannot read random bytes for message")
+		}
+
+		ct, err := Encrypt(pt, d.IV(), d.Key, d.Blocksize())
+		if err != nil {
+			t.Errorf("Encrypt: encryption failed: %q", err)
+		}
+
+		if !d.CorrectPadding(ct) {
+			t.Errorf("CorrectPadding() => false, expected true")
+		}
+	}
+}
+
+func TestInCorrectPadding(t *testing.T) {
+
+	iv := []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}
+	key := []byte{8, 7, 6, 5, 4, 3, 2, 1, 16, 15, 14, 13, 12, 11, 10, 9}
+	pt := []byte{60, 60, 60, 60, 60, 60, 60, 60, 60}
+
+	d := DemoOracle{iv, key, 16}
+
+	ct, err := Encrypt(pt, iv, key, 16)
+	if err != nil {
+		t.Errorf("Encrypt: encryption failed: %q", err)
+	}
+
+	if !d.CorrectPadding(ct) {
+		t.Errorf("CorrectPadding(%q) => false, expected true", ct)
+	}
+
+	// corrupt ciphertext and padding
+	ct[len(ct)-1] = ct[len(ct)-1] ^ 4
+
+	if d.CorrectPadding(ct) {
+		t.Errorf("CorrectPadding(%q) => false, expected true", ct)
+	}
+}

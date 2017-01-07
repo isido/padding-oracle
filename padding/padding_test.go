@@ -2,6 +2,7 @@ package padding
 
 import (
 	"bytes"
+	"math/rand"
 	"testing"
 )
 
@@ -57,4 +58,28 @@ func TestUnpaddingExamples(t *testing.T) {
 		}
 	}
 
+}
+
+func TestPaddingAndUnpadding(t *testing.T) {
+
+	// 100 random instances
+	for i := 0; i < 100; i++ {
+
+		s := rand.Int31n(1000) + 24
+		ts := make([]byte, s)
+		_, err := rand.Read(ts)
+
+		padded, err := PadPKCS7(ts, 16)
+		if err != nil {
+			t.Errorf("PadPKCS7(%q, 16) => error %q", ts, err)
+		}
+		unpadded, err := UnpadPKCS7(padded)
+		if err != nil {
+			t.Errorf("UnpadPKCS7(%q) => error %q", ts, err)
+		}
+
+		if !bytes.Equal(ts, unpadded) {
+			t.Errorf("Original (%q) != Padded and unpadded (%q)", ts, unpadded)
+		}
+	}
 }
